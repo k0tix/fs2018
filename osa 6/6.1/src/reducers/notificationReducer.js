@@ -15,17 +15,19 @@ const reducer = (store = text, action) => {
 
 }
 
-export const setNotification = (text) => {
-    return {
-        type: SET,
-        text
+export const setNotification = (text, time) => {
+    return async(dispatch) => {
+        dispatch({
+            type: SET,
+            text
+        })
+        setTimeout(() => {
+            dispatch({
+                type: REMOVE
+            })
+        }, time * 1000)
     }
 }
 
-export const removeNotification = () => {
-    return {
-        type: REMOVE
-    }
-}
 
 export default reducer

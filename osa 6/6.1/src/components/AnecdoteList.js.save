@@ -1,12 +1,11 @@
 import React from 'react'
 import { voteAnecdote } from '../reducers/anecdoteReducer'
-import { setNotification } from '../reducers/notificationReducer'
+import { setNotification, removeNotification } from '../reducers/notificationReducer'
 import Filter from './Filter'
 import {connect} from 'react-redux'
 import anecdoteService from '../services/anecdotes'
 
 class AnecdoteList extends React.Component {
-
   handleVote = (anecdote) => {
     return async () => {
 
@@ -17,7 +16,10 @@ class AnecdoteList extends React.Component {
       }
 
       this.props.voteAnecdote(newAnecdote.id, newAnecdote)
-      this.props.setNotification(`you voted '${newAnecdote.content}'`, 5)
+      this.props.setNotification(`you voted '${votedAnecdote.content}'`)
+      setTimeout(() => {
+        this.props.removeNotification()
+      }, 5000)
     }
   }
 
@@ -59,6 +61,7 @@ const ConnectedAnecdoteList = connect(
   mapStateToProps,
   {
     setNotification,
+    removeNotification,
     voteAnecdote
   }
 )(AnecdoteList)
