@@ -1,0 +1,14 @@
+p, div{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.notification {
+    color: rgb(58, 57, 57);
+    background:lightgrey;
+    font-size: 20px;
+    border-radius: 5px;
+    padding: 10px;
+    max-width: 200px;
+    margin: 10px;
+    text-align: center;
+}
