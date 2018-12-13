@@ -1,12 +1,13 @@
 import React from 'react'
 import blogService from '../services/blogs'
+import {likeBlog} from '../reducers/blogReducer'
+import {connect} from 'react-redux'
 
 class Blog extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       visible: false,
-      blog: props.blog,
       deleted: false
     }
   }
@@ -15,13 +16,8 @@ class Blog extends React.Component {
     this.setState({ visible: !this.state.visible })
   }
 
-  like = (blog) => {
-    return async () => {
-      const newBlog = { ...blog }
-      newBlog.likes = newBlog.likes + 1
-      await blogService.update(newBlog)
-      this.setState({ blog: newBlog })
-    }
+  like = (blog) =>  () => {
+    this.props.likeBlog(blog)
   }
 
   delete = (blog) => {
@@ -47,22 +43,24 @@ class Blog extends React.Component {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     let showIfCretor
 
+
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      showIfCretor = { display: user.username === this.state.blog.user.username ? '' : 'none' }
+
+      showIfCretor = { display: user.username === this.props.blog.user.username ? '' : 'none' }
     }
 
     if (!this.state.deleted) {
       return (
         <div style={blogStyle}>
           <div>
-            <h3 className="title" onClick={this.toggleVisibility}>{this.state.blog.title} {this.state.blog.author}</h3>
+            <h3 className="title" onClick={this.toggleVisibility}>{this.props.blog.title} {this.props.blog.author}</h3>
           </div>
           <div className="info" style={showWhenVisible}>
-            <a href={`http://${this.state.blog.url}`}>{this.state.blog.url}</a> <br></br>
-            {this.state.blog.likes} likes <button onClick={this.like(this.state.blog)}>like</button> <br></br>
-            added by {this.state.blog.user.name} <br></br>
-            <button style={showIfCretor} onClick={this.delete(this.state.blog)}>delete</button>
+            <a href={`http://${this.props.blog.url}`}>{this.props.blog.url}</a> <br></br>
+            {this.props.blog.likes} likes <button onClick={this.like(this.props.blog)}>like</button> <br></br>
+            added by {this.props.blog.user.name} <br></br>
+            <button style={showIfCretor} onClick={this.delete(this.props.blog)}>delete</button>
           </div>
         </div>
       )
@@ -76,4 +74,4 @@ class Blog extends React.Component {
   }
 }
 
-export default Blog
+export default connect(null, {likeBlog})(Blog)

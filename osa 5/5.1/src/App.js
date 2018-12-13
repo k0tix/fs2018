@@ -5,17 +5,19 @@ import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Togglable from './components/Togglable'
+import {connect} from 'react-redux'
+
+import {setNotification} from './reducers/notificationReducer'
+import {createBlog, blogInitialization} from './reducers/blogReducer'
 
 class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      blogs: [],
       title: '',
       author: '',
       url: '',
       error: null,
-      notification: '',
       username: '',
       password: '',
       user: null
@@ -23,9 +25,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    blogService.getAll().then(blogs =>
-      this.setState({ blogs })
-    )
+    this.props.blogInitialization()
 
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
@@ -60,12 +60,8 @@ class App extends React.Component {
         user
       })
     } catch (exception) {
-      this.setState({
-        notification: 'username or password incorrect'
-      })
-      setTimeout(() => {
-        this.setState({ notification: '' })
-      }, 2500)
+      this.props.setNotification('username or password incorrect', 2)
+      
     }
   }
 
@@ -78,31 +74,26 @@ class App extends React.Component {
   createBlog = async (event) => {
     event.preventDefault()
     try {
-      const blog = await blogService.create({
+      const blog = {
         title: this.state.title,
         author: this.state.author,
         url: this.state.url
-      })
+      }
+
+      this.props.createBlog(blog)
 
       this.setState({
         title: '',
         author: '',
-        url: '',
-        notification: `blog "${blog.title}" was succesfully added`,
-        blogs: await blogService.getAll()
+        url: ''
       })
-      setTimeout(() => {
-        this.setState({notification: ''})
-      }, 2500)
+
+      this.props.setNotification(`blog "${blog.title}" was succesfully added`, 2)
 
     } catch (exception) {
       console.log(exception)
-      this.setState({
-        notification: 'something went wrong'
-      })
-      setTimeout(() => {
-        this.setState({notification: ''})
-      }, 2500)
+      this.props.setNotification('something went wrong', 2)
+      
     }
 
   }
@@ -150,7 +141,7 @@ class App extends React.Component {
 
     const blogs = () => (
       <div>
-        {this.state.blogs
+        {this.props.blogs
         .sort((a,b) => b.likes - a.likes)
         .map(blog =>
           <Blog blog={blog} key={blog._id} />
@@ -161,7 +152,7 @@ class App extends React.Component {
     return (
       <div>
         <h1>blogs</h1>
-        <Notification notification={this.state.notification} />
+        <Notification />
         {this.state.user === null ?
           loginForm() :
           <div>
@@ -177,4 +168,10 @@ class App extends React.Component {
   }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    blogs: state.blogs
+  }
+}
+
+export default connect(mapStateToProps, {setNotification, createBlog, blogInitialization})(App)
