@@ -24,7 +24,7 @@ const AnecdoteList = ({ anecdotes }) => (
 )
 
 const Anecdote = ({anecdote}) => (
-  <div style={{margin: '1em'}}>
+  <div style={{margin: '1em'}}>  
     <h2>{anecdote.content}</h2>
     <p>has {anecdote.votes} votes</p>
     <p>for more info see <a href={anecdote.info}>{anecdote.info}</a></p>
@@ -73,7 +73,7 @@ class CreateNew extends React.Component {
     super()
     this.state = {
       content: '',
-      author: '',
+      author: '', 
       info: ''
     }
   }

@@ -1,4 +1,4 @@
-#Full stack open 2018
+# Full stack open 2018
 
 | Osa           | Tehtävät      | Yhteensä   |
 | ------------- |:-------------:| -------:|
@@ -9,7 +9,7 @@
 | osa4          | 100%			| 21/21   |
 | osa5          | 100%			| 21/21   |
 | osa6          | 100%			| 23/23   |
-| osa7          | 8%			| 2/23    |
-| Yhteensä      | 81%			| 122/149 |
+| osa7          | 17%			| 4/23    |
+| Yhteensä      | 83%			| 124/149 |
 
 [osa3 puhelinluettelo](https://fskotix-persons.herokuapp.com)

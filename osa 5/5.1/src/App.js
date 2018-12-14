@@ -7,8 +7,11 @@ import loginService from './services/login'
 import Togglable from './components/Togglable'
 import {connect} from 'react-redux'
 
+import {BrowserRouter as Router} from 'react-router-dom'
+
 import {setNotification} from './reducers/notificationReducer'
 import {createBlog, blogInitialization} from './reducers/blogReducer'
+import {userInitialization, setUser} from './reducers/userReducer'
 
 class App extends React.Component {
   constructor(props) {
@@ -19,20 +22,21 @@ class App extends React.Component {
       url: '',
       error: null,
       username: '',
-      password: '',
-      user: null
+      password: ''
     }
   }
 
   componentDidMount() {
     this.props.blogInitialization()
+    this.props.userInitialization()
 
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      this.setState({ user })
       blogService.setToken(user.token)
+      this.props.setUser(user)
     }
+
   }
 
   handleLoginFieldChange = (event) => {
@@ -54,21 +58,25 @@ class App extends React.Component {
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       blogService.setToken(user.token)
 
+      this.props.setUser(user)
+
       this.setState({
         username: '',
         password: '',
-        user
       })
+
+      this.props.setNotification('login successful', 2)
+      
     } catch (exception) {
       this.props.setNotification('username or password incorrect', 2)
-      
     }
   }
 
   logout = (event) => {
     event.preventDefault()
     window.localStorage.removeItem('loggedBlogappUser')
-    this.setState({ user: null })
+    this.props.setUser(null)
+    this.props.setNotification('logged out', 2)
   }
 
   createBlog = async (event) => {
@@ -151,16 +159,20 @@ class App extends React.Component {
 
     return (
       <div>
+        <Router>
+          <div>
         <h1>blogs</h1>
         <Notification />
-        {this.state.user === null ?
+        {this.props.user === null ?
           loginForm() :
           <div>
-            <p>{this.state.user.name} logged in <button onClick={this.logout}>logout</button></p>
+            <p>{this.props.user.name} logged in <button onClick={this.logout}>logout</button></p>
             {blogFrom()}
             <p></p>
             {blogs()}
           </div>}
+          </div>
+         </Router>
       </div>
     )
 
@@ -170,8 +182,10 @@ class App extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    blogs: state.blogs
+    blogs: state.blogs,
+    users: state.users.users,
+    user: state.users.user
   }
 }
 
-export default connect(mapStateToProps, {setNotification, createBlog, blogInitialization})(App)
+export default connect(mapStateToProps, {setNotification, createBlog, blogInitialization, userInitialization, setUser})(App)
