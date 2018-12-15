@@ -1,14 +1,16 @@
 import React from 'react'
 import blogService from '../services/blogs'
 import {likeBlog} from '../reducers/blogReducer'
+import {setNotification} from '../reducers/notificationReducer'
 import {connect} from 'react-redux'
-import {Button, Label, Item, Header} from 'semantic-ui-react'
+import {Button, Label, Item, Header, Comment} from 'semantic-ui-react'
 
 class Blog extends React.Component {
       constructor(props) {
             super(props)
             this.state = {
-                  deleted: false
+                  deleted: false,
+                  comment: ''
             }
       }
 
@@ -22,6 +24,29 @@ class Blog extends React.Component {
                     await blogService.remove(blog)
                     this.setState({ deleted: true })
               }
+        }
+  }
+
+  handleCommentFieldChange = (event) => {
+        this.setState({ comment: event.target.value })
+  }
+
+  createComment = async (event) => {
+        event.preventDefault()
+        try {
+              const comment = this.state.comment
+              await blogService.comment(comment, this.props.blog._id)
+
+              this.setState({
+                    comment: ''
+              })
+
+              this.props.setNotification('comment was succesfully added', 2)
+
+        } catch (exception) {
+              console.log(exception)
+              this.props.setNotification('something went wrong', 2)
+      
         }
   }
 
@@ -50,6 +75,29 @@ class Blog extends React.Component {
               added by {this.props.blog.user.name}</div>
               
                                             <Button color='red' style={showIfCretor} onClick={this.delete(this.props.blog)}>delete</Button>
+
+                                            <Comment.Group>
+                                                  <Header as='h3' dividing>
+                                                Comments
+                                                  </Header>
+
+                                                  {this.props.blog.comments === undefined ? null : 
+                                                        this.props.blog.comments.map(comment => 
+                                                              <Comment key={comment}>
+                                                                    <Comment.Content>
+                                                                          <Comment.Author as='a'>Anonymous</Comment.Author>
+                                                                          <Comment.Metadata>
+                                                                                <div>ehkä joskus pari päivää sitte</div>
+                                                                          </Comment.Metadata>
+                                                                          <Comment.Text>{comment}</Comment.Text>
+                                                                          <Comment.Actions>
+                                                                                <Comment.Action>Reply</Comment.Action>
+                                                                          </Comment.Actions>
+                                                                    </Comment.Content>
+                                                              </Comment>
+                                                        )
+                                                  }
+                                            </Comment.Group>
                                       </Item.Description>
                                 </Item.Content>
                           </Item>
@@ -66,4 +114,4 @@ class Blog extends React.Component {
   }
 }
 
-export default connect(null, {likeBlog})(Blog)
+export default connect(null, {likeBlog, setNotification})(Blog)

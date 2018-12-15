@@ -4,29 +4,29 @@ const SET = 'SET_NOTIFICATION'
 const REMOVE = 'REMOVE_NOTIFICATION'
 
 const reducer = (store = text, action) => {
-    switch(action.type) {
-        case SET:
+      switch(action.type) {
+      case SET:
             return action.text
-        case REMOVE:
+      case REMOVE:
             return null
-        default:
+      default:
             return store
-    }
+      }
 
 }
 
 export const setNotification = (text, time) => {
-    return async(dispatch) => {
-        dispatch({
-            type: SET,
-            text
-        })
-        setTimeout(() => {
+      return async(dispatch) => {
             dispatch({
-                type: REMOVE
+                  type: SET,
+                  text
             })
-        }, time * 1000)
-    }
+            setTimeout(() => {
+                  dispatch({
+                        type: REMOVE
+                  })
+            }, time * 1000)
+      }
 }
 
 

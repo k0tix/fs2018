@@ -49,6 +49,30 @@ blogsRouter.post('/', async (request, response) => {
     }
 })
 
+blogsRouter.post('/:id/comments', async (request, response) => {
+    const body = request.body
+    
+    try {
+        const decodedToken = jwt.verify(request.token, process.env.SECRET)
+
+        if (!decodedToken.id) {
+            return response.status(401).json({ error: 'token missing or invalid' })
+        }
+
+        const blog = await Blog.findById(request.params.id)
+        if(!blog.comments) blog.comments = []
+        blog.comments = blog.comments.concat(body.comment)
+
+        const updatedBlog = await Blog
+            .findByIdAndUpdate(request.params.id, blog, { new: true })
+        
+        response.status(204).send(updatedBlog)
+    } catch (exception) {
+        console.log(exception)
+        response.status(400).send({ error: 'malformatted id' })
+    }
+})
+
 blogsRouter.delete('/:id', async (request, response) => {
     try {
         const decodedToken = jwt.verify(request.token, process.env.SECRET)
