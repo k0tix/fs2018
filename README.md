@@ -2,14 +2,14 @@
 
 | Osa           | Tehtävät      | Yhteensä   |
 | ------------- |:-------------:| -------:|
-| osa0          | 0%			| 0/6     |
+| osa0          | 100%			| 6/6     |
 | osa1          | 100%			| 14/14   |
 | osa2          | 100%			| 19/19   |
 | osa3          | 100%			| 22/22   |
 | osa4          | 100%			| 21/21   |
 | osa5          | 100%			| 21/21   |
 | osa6          | 100%			| 23/23   |
-| osa7          | 17%			| 4/23    |
-| Yhteensä      | 83%			| 124/149 |
+| osa7          | 47%			| 11/23    |
+| Yhteensä      | 91%			| 137/149 |
 
 [osa3 puhelinluettelo](https://fskotix-persons.herokuapp.com)
