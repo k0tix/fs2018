@@ -3,38 +3,38 @@ import userService from '../services/users'
 const INIT = 'INIT_USERS'
 const LOGIN = 'LOGIN_USER'
 
-const reducer = (state = {user: null, users: null}, action) => {
-    switch(action.type) {
-        case INIT:
+const reducer = (state = { user: null, users: null }, action) => {
+      switch (action.type) {
+      case INIT:
             return Object.assign({}, state, {
-                users: action.data
+                  users: action.data
             })
-        case LOGIN:
+      case LOGIN:
             return Object.assign({}, state, {
-                user: action.user
+                  user: action.user
             })
-        default:
+      default:
             return state
-    }
+      }
 }
 
 export const userInitialization = () => {
-    return async (dispatch) => {
-        const users = await userService.getAll()
-        dispatch({
-            type: INIT,
-            data: users
-        })
-    }
+      return async (dispatch) => {
+            const users = await userService.getAll()
+            dispatch({
+                  type: INIT,
+                  data: users
+            })
+      }
 }
 
 export const setUser = (user) => {
-    return (dispatch) => {
-        dispatch({
-            type: LOGIN,
-            user
-        })
-    }
+      return (dispatch) => {
+            dispatch({
+                  type: LOGIN,
+                  user
+            })
+      }
 }
 
 export default reducer
