@@ -4,17 +4,17 @@ const CREATE = 'CREATE_BLOG'
 const INIT = 'INIT_BLOGS'
 const LIKE = 'LIKE_BLOG'
 
-const reducer = (store = [], action) => {
+const reducer = (state = [], action) => {
     switch(action.type) {
         case CREATE:
-            return [...store, action.newBlog]
+            return [...state, action.newBlog]
         case INIT:
             return action.data
         case LIKE:
-            const old = store.filter(a => a._id !== action.newBlog._id)
+            const old = state.filter(a => a._id !== action.newBlog._id)
             return [...old, action.newBlog]
         default:
-            return store
+            return state
     }
 }
 

@@ -1,10 +1,9 @@
 import React from 'react'
 import {connect} from 'react-redux'
+import {Message} from 'semantic-ui-react'
 
 const style = {
-  border: 'solid',
-  padding: 10,
-  borderWidth: 1
+  padding: 10
 }
 
 const Notification = (props) => {
@@ -14,7 +13,7 @@ const Notification = (props) => {
 
   return(
     <div style={style}>
-      {props.notification}
+      <Message color='teal' header={props.notification} />
     </div>
   )
 }

@@ -6,8 +6,9 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import Togglable from './components/Togglable'
 import {connect} from 'react-redux'
+import {Container, Menu, Button, Input, Header, Form, List, Table, Label} from 'semantic-ui-react'
 
-import {BrowserRouter as Router} from 'react-router-dom'
+import {BrowserRouter as Router, Route, NavLink, Link} from 'react-router-dom'
 
 import {setNotification} from './reducers/notificationReducer'
 import {createBlog, blogInitialization} from './reducers/blogReducer'
@@ -27,16 +28,15 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    this.props.blogInitialization()
     this.props.userInitialization()
+    this.props.blogInitialization()
 
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       blogService.setToken(user.token)
-      this.props.setUser(user)
+      this.props.setUser(user) 
     }
-
   }
 
   handleLoginFieldChange = (event) => {
@@ -65,7 +65,6 @@ class App extends React.Component {
         password: '',
       })
 
-      this.props.setNotification('login successful', 2)
       
     } catch (exception) {
       this.props.setNotification('username or password incorrect', 2)
@@ -76,7 +75,6 @@ class App extends React.Component {
     event.preventDefault()
     window.localStorage.removeItem('loggedBlogappUser')
     this.props.setUser(null)
-    this.props.setNotification('logged out', 2)
   }
 
   createBlog = async (event) => {
@@ -111,32 +109,32 @@ class App extends React.Component {
       <div className="loginForm">
         <h2>Log in to application</h2>
 
-        <form onSubmit={this.login}>
-          <div>
-            username:
-            <input
+        <Form onSubmit={this.login}>
+          <Form.Field>
+            <label>Username</label>
+            <Input
               type="text"
               name="username"
               value={this.state.username}
               onChange={this.handleLoginFieldChange}
             />
-          </div>
-          <div>
-            password:
-            <input
+          </Form.Field>
+          <Form.Field>
+            <label>Password</label>
+            <Input
               type="password"
               name="password"
               value={this.state.password}
               onChange={this.handleLoginFieldChange}
             />
-          </div>
-          <button type="submit">Log in</button>
-        </form>
+          </Form.Field>
+          <Button type="submit">Log in</Button>
+        </Form>
       </div>
     )
 
     const blogFrom = () => (
-      <Togglable buttonLabel="new blog">
+      <Togglable button={Button} buttonLabel="new blog">
         <BlogForm 
           onSubmit={this.createBlog}
           title={this.state.title}
@@ -148,32 +146,115 @@ class App extends React.Component {
     )
 
     const blogs = () => (
-      <div>
+      <Table>
+        <Table.Body>
         {this.props.blogs
         .sort((a,b) => b.likes - a.likes)
         .map(blog =>
-          <Blog blog={blog} key={blog._id} />
+          <Table.Row key={blog._id}>
+            <Table.Cell>
+              <Link to={`/blogs/${blog._id}`}>{blog.title}</Link>
+            </Table.Cell>
+          </Table.Row>
         )}
-      </div>
+        </Table.Body>
+      </Table>
     )
 
     return (
+      <Container>
       <div>
         <Router>
           <div>
-        <h1>blogs</h1>
-        <Notification />
-        {this.props.user === null ?
-          loginForm() :
-          <div>
-            <p>{this.props.user.name} logged in <button onClick={this.logout}>logout</button></p>
-            {blogFrom()}
-            <p></p>
-            {blogs()}
-          </div>}
+
+          <Header as='h1'>blog app</Header>
+
+          <Notification />
+
+          {this.props.user === null ?
+              loginForm() :
+              <div>
+                <Menu fluid inverted>
+                  <Menu.Item as={NavLink} exact to='/'>blogs</Menu.Item>
+                  <Menu.Item as={NavLink} exact to='/users'>users</Menu.Item>
+                  <Menu.Item><div><Label color='pink'>{this.props.user.name}</Label> logged in <Button color='red' onClick={this.logout}>logout</Button></div></Menu.Item>
+                </Menu>
+                {blogFrom()}
+                </div>}
+
+        <Route exact path='/blogs/:id' render={({match}) => {
+          const blog = this.props.blogs === null ? null : this.props.blogs.find(blog => blog._id === match.params.id)
+          return (
+            blog === undefined ? null : 
+            <div>
+              <Blog blog={blog}></Blog>
+            </div>
+          )
+        }}/>
+
+        <Route exact path='/users/:id' render={({match}) => {
+            const user = this.props.users === null ? null : this.props.users.find(user => user.id === match.params.id)
+            return (
+              user === null ? null : <div>
+              <Header as='h1'>{`${user.name}`}</Header>
+              <Header as='h2'>Added blogs</Header>
+              <Table color='blue' striped>
+                <Table.Body>
+                  {user.blogs.map(blog => 
+                    <Table.Row key={blog._id}>
+                    <Table.Cell>
+                      <Link to={`/blogs/${blog._id}`}>{blog.title}</Link>
+                    </Table.Cell>
+                  </Table.Row>  
+                  )}
+                </Table.Body>
+              </Table>
+              </div>
+            )
+            }
+          }
+        />
+
+          <Route path='/users' render={() =>
+          this.props.users === null ? null : 
+          <Table celled striped>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>
+                  User
+                </Table.HeaderCell>
+                <Table.HeaderCell>
+                  blogs added
+                </Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {this.props.users.map(user => 
+                <Table.Row key={user.name}>
+                  <Table.Cell>
+                    <Link to={`/users/${user.id}`}>{user.name}</Link>
+                  </Table.Cell>
+                  <Table.Cell>
+                    {user.blogs.length}
+                  </Table.Cell>
+                </Table.Row>
+              )}
+            </Table.Body>
+          </Table>
+          } />
+
+          <Route exact path='/' render={() => 
+          this.props.user === null ? null :
+                <List>
+                  {blogs()}
+                </List>
+                
+          }/>
+      
           </div>
          </Router>
       </div>
+      </Container>
     )
 
 

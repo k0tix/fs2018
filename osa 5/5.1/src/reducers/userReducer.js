@@ -3,19 +3,18 @@ import userService from '../services/users'
 const INIT = 'INIT_USERS'
 const LOGIN = 'LOGIN_USER'
 
-const reducer = (store = {user: null, users: null}, action) => {
-
-    const newStore = store
-
+const reducer = (state = {user: null, users: null}, action) => {
     switch(action.type) {
         case INIT:
-            newStore.users = action.users
-            return newStore
+            return Object.assign({}, state, {
+                users: action.data
+            })
         case LOGIN:
-            newStore.user = action.user
-            return newStore
+            return Object.assign({}, state, {
+                user: action.user
+            })
         default:
-            return store
+            return state
     }
 }
 
@@ -24,7 +23,7 @@ export const userInitialization = () => {
         const users = await userService.getAll()
         dispatch({
             type: INIT,
-            users
+            data: users
         })
     }
 }
